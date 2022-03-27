@@ -40,7 +40,139 @@ private:
 		
 };		
 		
-				
+Lines_window::Lines_window(Point xy, int w, int h, const string& title)
+    :Window(xy,w,h,title),
+    //16.5
+    next_button(Point(x_max()-150,0),70,20,"Next point",cb_next),
+    quit_button(Point(x_max()-70,0),70,20,"Quit",cb_quit),
+    next_x(Point(x_max()-310,0),50,20,"next x:"),
+    next_y(Point(x_max()-210,0),50,20,"next y:"),
+    xy_out(Point(100,0),100,20,"current (x,y):"),
+    //16.7
+    color_menu(Point(x_max()-70,30),70,20,Menu::vertical,"color"),
+    menu_button(Point(x_max()-80,30),80,20,"color menu",cb_menu),
+    style_menu(Point(x_max()-70,60),70,20,Menu::vertical,"style"),
+    stylemenu_button(Point(x_max()-80,60),80,20,"style menu",cb_stylemenu)
+{
+    attach(next_button);
+    attach(quit_button);
+    attach(next_x);
+    attach(next_y);
+    attach(xy_out);
+
+    xy_out.put("no point");
+    //callbacks
+
+    //line colors
+    color_menu.attach(new Button(Point(0,0),0,0,"red",cb_red));
+    color_menu.attach(new Button(Point(0,0),0,0,"blue",cb_blue));
+    color_menu.attach(new Button(Point(0,0),0,0,"black",cb_black));
+    color_menu.attach(new Button(Point(0,0),0,0,"green",cb_green));
+    attach(color_menu);
+    color_menu.hide();
+    attach(menu_button);
+    //line styles
+    style_menu.attach(new Button(Point(0,0),0,0,"solid",cb_solid));
+    style_menu.attach(new Button(Point(0,0),0,0,"dashed",cb_dash));
+    style_menu.attach(new Button(Point(0,0),0,0,"dotted",cb_dot));
+    attach(style_menu);
+    style_menu.hide();
+    attach(stylemenu_button);
+    attach(lines);
+}
+
+void Lines_window::show_menu()
+{
+    int dy = (color_menu.selection.size()-1)*20;
+    stylemenu_button.move(0,dy);
+    for (int i = 0; i<style_menu.selection.size(); ++i)
+        style_menu.selection[i].move(0,dy);
+    hide_stylemenu();
+    color_menu.show();
+}
+
+void Lines_window::hide_menu()
+{
+    color_menu.hide();
+    menu_button.show();
+    int dy = -(color_menu.selection.size()-1)*20;
+    stylemenu_button.move(0,dy);
+    for (int i = 0; i<style_menu.selection.size(); ++i)
+        style_menu.selection[i].move(0,dy);
+    hide_stylemenu();
+}
+
+
+//callbacks
+void Lines_window::cb_red(Address, Address pw){
+    reference_to<Lines_window>(pw).red_pressed();}
+
+void Lines_window::cb_blue(Address, Address pw){
+    reference_to<Lines_window>(pw).blue_pressed();}
+
+void Lines_window::cb_black(Address, Address pw){
+    reference_to<Lines_window>(pw).black_pressed();}
+
+void Lines_window::cb_green(Address, Address pw){
+    reference_to<Lines_window>(pw).green_pressed();}
+
+void Lines_window::cb_menu(Address, Address pw){
+    reference_to<Lines_window>(pw).menu_pressed();}
+
+void Lines_window::cb_solid(Address, Address pw){
+    reference_to<Lines_window>(pw).solid_pressed();}
+
+void Lines_window::cb_dash(Address, Address pw){
+    reference_to<Lines_window>(pw).dash_pressed();}
+
+void Lines_window::cb_dot(Address, Address pw){
+    reference_to<Lines_window>(pw).dot_pressed();}
+
+void Lines_window::cb_stylemenu(Address, Address pw){
+    reference_to<Lines_window>(pw).stylemenu_pressed();}
+
+void Lines_window::cb_quit(Address, Address pw){
+    reference_to<Lines_window>(pw).quit();}
+
+void Lines_window::cb_next(Address, Address pw){
+    reference_to<Lines_window>(pw).next();}
+
+
+
+
+void Lines_window::quit()
+{
+    hide(); // curious FLTK idiom to delete window
+}
+void Lines_window::next()
+{
+    int x = next_x.get_int();
+    int y = next_y.get_int();
+    lines.add(Point{x,y});
+    // update current position:
+    ostringstream ss;
+    ss << '(' << x << ',' << y << ')';
+    xy_out.put(ss.str());
+
+    redraw();
+}
+
+
+
+//#include "GUI.h"
+int main()
+try {
+    Lines_window win {Point{100,100},600,400,"lines"};
+    return gui_main();
+}
+    catch(exception& e) {
+    cerr << "exception: " << e.what() << '\n';
+    return 1;
+}
+    catch (...) {
+    cerr << "Some exception\n";
+    return 2;
+}				
 				
 				
 						
